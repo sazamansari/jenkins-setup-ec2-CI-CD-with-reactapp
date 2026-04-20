@@ -1,4 +1,3 @@
-````md
 # React App Deployment with Jenkins on AWS EC2 (Amazon Linux)
 
 This guide explains how to deploy a React app on an AWS EC2 Linux server using Jenkins and Nginx.
@@ -13,9 +12,9 @@ Whenever you push code to GitHub, Jenkins will pull the latest code, build it, a
 
 ## Prerequisites
 
-- AWS EC2 Instance (Amazon Linux)
+- AWS EC2 Instance on :contentReference[oaicite:0]{index=0}
 - `.pem` key pair
-- GitHub repository with React project
+- GitHub repository with React project on :contentReference[oaicite:1]{index=1}
 - Security Group ports open:
 
 | Port | Use |
@@ -31,7 +30,7 @@ Whenever you push code to GitHub, Jenkins will pull the latest code, build it, a
 ```bash
 chmod 400 jenkins3211.pem
 ssh -i "jenkins3211.pem" ec2-user@YOUR_PUBLIC_IP
-````
+```
 
 Switch to root user:
 
@@ -60,7 +59,7 @@ nginx -v
 
 ## Step 3: Install Java 21
 
-Jenkins latest version requires Java 21.
+Latest :contentReference[oaicite:2]{index=2} requires Java 21.
 
 ```bash
 dnf install java-21-amazon-corretto -y
@@ -138,9 +137,9 @@ Copy the password.
 http://YOUR_PUBLIC_IP:8080
 ```
 
-* Paste password
-* Install suggested plugins
-* Create admin user
+- Paste password  
+- Install suggested plugins  
+- Create admin user
 
 ---
 
@@ -159,7 +158,7 @@ location / {
     root /usr/share/nginx/html;
     index index.html;
     try_files $uri /index.html;
-    
+
     add_header Cache-Control "no-cache, no-store, must-revalidate";
 }
 ```
@@ -174,18 +173,46 @@ systemctl enable nginx
 
 ---
 
-## Step 10: Create Jenkins Job
+## Step 10: Allow Jenkins sudo Without Password (Important)
 
-Go to Jenkins Dashboard:
+To allow Jenkins to restart Nginx or copy files without password:
 
-* Click **New Item**
-* Enter name: `react-app`
-* Select **Freestyle Project**
-* Click **OK**
+```bash
+sudo visudo
+```
+
+Add this line at the bottom:
+
+```bash
+jenkins ALL=(ALL) NOPASSWD: ALL
+```
+
+Save and exit.
+
+### Why This Is Needed
+
+:contentReference[oaicite:3]{index=3} runs jobs using the `jenkins` user.  
+Without sudo permission, commands like below may fail:
+
+```bash
+sudo systemctl restart nginx
+sudo cp -r build/* /usr/share/nginx/html/
+```
 
 ---
 
-## Step 11: Connect GitHub Repository
+## Step 11: Create Jenkins Job
+
+Go to Jenkins Dashboard:
+
+- Click **New Item**
+- Enter name: `react-app`
+- Select **Freestyle Project**
+- Click **OK**
+
+---
+
+## Step 12: Connect GitHub Repository
 
 Inside Jenkins Job:
 
@@ -207,22 +234,22 @@ main
 
 ---
 
-## Step 12: Add Build Step
+## Step 13: Add Build Step
 
 Add **Execute Shell**
 
 ```bash
 npm install
 npm run build
-cp -r build/* /usr/share/nginx/html/
-systemctl restart nginx
+sudo cp -r build/* /usr/share/nginx/html/
+sudo systemctl restart nginx
 ```
 
 Save the job.
 
 ---
 
-## Step 13: Build Project
+## Step 14: Build Project
 
 Click:
 
@@ -240,9 +267,9 @@ Your React app will be live.
 
 ---
 
-## Step 14: Auto Deploy on Git Push
+## Step 15: Auto Deploy on Git Push
 
-GitHub Repo → Settings → Webhooks
+:contentReference[oaicite:4]{index=4} Repo → Settings → Webhooks
 
 Add:
 
@@ -284,7 +311,6 @@ journalctl -xeu jenkins.service
 
 ## Done
 
-Your React app is now deployed using Jenkins on AWS EC2 with automatic CI/CD.
+Your React app is now deployed using :contentReference[oaicite:5]{index=5} on :contentReference[oaicite:6]{index=6} EC2 with automatic CI/CD.
 
-```
 ```
